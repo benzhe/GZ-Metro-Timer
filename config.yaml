@@ -1,0 +1,11 @@
+handle:
+
+- compress: if ( out_header["Content-type"]=="text/css" ) compress
+- compress: if ( out_header["Content-type"]=="text/javascript" ) compress
+- compress: if ( out_header["Content-type"]=="application/octet-stream" ) compress
+- compress: if ( out_header["Content-type"]=="text/html" ) compress
+- compress: if ( out_header["Content-type"]=="application/zip" ) compress
+- compress: if ( out_header["Content-type"]=="application/x-zip-compressed" ) compress
+- compress: if ( out_header["Content-type"]=="text/plain" ) compress
+- compress: if ( out_header["Content-type"]=="image/jpeg" ) compress
+- compress: if ( out_header["Content-type"]=="application/javascript" ) compress 

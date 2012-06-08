@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        text-align: center;
+        font-size: 12px;
+      }
+      #content{
+        max-width:600px;
+        margin:0 auto;
+      }
+      input {
+      }
+      .stP{
+        position:relative;
+        margin:20px 0;
+      }
+      .stTip {
+        position:absolute;
+        padding:0;
+        margin:0;
+        border:1px solid #999;
+        z-index: 9999;
+        display: none;
+        background: #fff;
+      }
+      .stTip li {
+        list-style: none;
+        padding:6px;
+        margin:0;
+        z-index: 9999;
+      }
+      iframe {
+        display:none;
+      }
+      table {        
+        width:100%;
+      }
+      .PathTable {
+        margin:10px auto;
+      }
+      td {
+	text-align:center;
+      }
+      .DetailTip {
+        width:26px;
+        font-size:18px;
+        font-weight:bold;
+      }
+      .AllTime {
+        font-size:72px;
+      }
+      .Hub {
+        font-weight:bold;	
+      }
+      .RouteName {
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+    </style>
+    <script type="text/javascript" src="tools.js"></script>
+    <script type="text/javascript" src="controll.js"></script>  
+    <script type="text/javascript" src="lines.js"></script> 
+      
+    <script>
+      var _Lock = false;
+      function showPath(){
+        document.getElementById('content').innerHTML = '';
+        Paths.sortBy('allTime');
+        
+        var Tmpl = '<tr> <td colspan=2 class="RouteName">{Route}</td> <td>{StationCount}，全程需要</td> </tr> <tr> <td rowspan=2 class="DetailTip">{PathNum}</td> <td rowspan=3> <table border="1" class="PathListTable"> {PathList} </table> </td> <td><span class="AllTime">{AllTime}</span><br /><span>分钟</span></td> </tr> <tr> <td class="HubTime">其中换乘{LineCount}次，需{HubTime}分钟</td> </tr>';
+        for(var num=0;(num<3 && num < Paths.length);++num){
+          var tmpl = Tmpl;
+          var paths = Paths[num].paths;
+          var lines = Paths[num].lines;
+          var route = [];
+          var startSt = paths[0];
+          var lastSt = (paths.slice(-1))[0]; //Paths[num].endSt          
+          for(var lineNum=0;lineNum<lines.length;lineNum++){
+            var line = lines[lineNum];
+            var hub = line[0];
+            var nextHub = '';
+            if(un(lines[lineNum+1])) nextHub = lastSt;
+            else nextHub = lines[lineNum+1][0];
+            route.push([startSt,hub]);
+            route.push([startSt,hub,line[1],line[2],Lines.getTermial(line[2], hub, nextHub)]);
+            startSt = hub;
+            if(lineNum == lines.length-1){
+              route.push([startSt, lastSt]);
+            }
+          }
+          //tmpl = tmpl.replace("{ID}", "Path"+num);
+          tmpl = tmpl.replace("{Route}",paths[0]+ ' 往 '+lastSt);
+          tmpl = tmpl.replace("{StationCount}","共"+paths.length+"站");
+          tmpl = tmpl.replace("{PathNum}","线路"+(num+1));
+          tmpl = tmpl.replace("{LineCount}",lines.length);
+          tmpl = tmpl.replace("{AllTime}", parseInt(Paths[num].allTime));
+          tmpl = tmpl.replace("{HubTime}", parseInt(Paths[num].allTime - Paths[num].stTime));
+          routeTmpl = '';
+          if(lines.length ==0 ) routeTmpl = '<tr><td>'+paths[0]+" &rArr; "+lastSt+'</td></tr>';
+          route.forEach(function(item){
+            if(un(item[3])) {
+              //非中转:
+              routeTmpl += '<tr><td>'+item[0]+" &rArr; "+item[1]+'</td></tr>';
+            }
+            else{
+              routeTmpl += '<tr><td class="Hub">在 '+item[1]+' 换乘 '+item[3]+'，方向：'+item[4]+'</td></tr>';
+            }
+          });
+          tmpl = tmpl.replace("{PathList}", routeTmpl);
+                   
+          if(navigator.userAgent.indexOf("MSIE")>0) {
+            var newElem = document.createElement('div'); 
+            newElem.innerHTML = ('<table id="Path'+num+'" border=1 class="PathTable" >'+tmpl+'</table>');
+          }
+          else{
+            var newElem = document.createElement('table'); 
+            newElem.setAttribute('id', 'Path'+num);
+            newElem.setAttribute('border', 1);
+            newElem.setAttribute('class', 'PathTable');            
+            newElem.innerHTML = tmpl;
+          }
+          document.getElementById('content').appendChild(newElem);
+          
+        }
+
+      }
+      function Find(start,end){
+        if(start.trim() == end.trim()) return;             
+        if(!_Lock) {          
+          _Lock = true;
+          Paths = [];   
+          findPath(start,start,end);
+          showPath();
+          _Lock = false;
+        }
+        
+      }      
+      //生成站点列表
+      function init(){
+        Stations.refresh();
+        //Find('广州东站', '大学城北');
+      }
+    </script>
+  </head>
+  <body onload="init();">
+    <div class="Search"><form target="haokudehaizi">
+        <div class="stP">出发站：<input id="startSt" type="text" autocomplete="off" /><ul class="stTip" id="startStTip"></ul></div>
+      <div class="stP">目的站：<input id="endSt" type="text" autocomplete="off" /><ul class="stTip" id="endStTip"></ul></div>
+      <p><input type="checkbox" id="Peak" style="vertical-align: middle;"/><label style="vertical-align: middle;">现在是上下班高峰期间</label></p>
+      <p><button id="find">查找线路并估计时间</button></p>
+      </form><iframe name="haokudehaizi"></iframe>
+    </div>
+    <div id="content">      
+      
+    </div>
+    <footer>
+      <p>* 到达时间仅供参考</p>
+      <p><a href="review.html">时间误差很大？请留言或反馈</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://gzrtbus.sinaapp.com" target="_blank">广州实时公交</a></p>
+    </footer>
+    <script type="text/javascript">
+      function showTips(elem, tipElem, focusClose){
+        var input = elem;
+        var str = elem.value;
+        var tipSts = [];
+        Stations.sts.forEach(function(st){
+          if(st.indexOf(str)>=0){
+            tipSts.push(st);
+          }
+        });
+        var tip = tipElem;
+        tip.innerHTML = '<li style="background:#ccc">请选择：</li>';
+        if(tipSts.length >= 1 && tipSts.length <= 4 && un(focusClose)) {
+          tip.style.cssText = 'display:block;cursor:pointer;left:'+(elem.offsetLeft)+'px;top:'+(elem.offsetTop + elem.offsetHeight)+'px;width:'+(elem.offsetWidth-2)+'px';
+          var temp = document.createDocumentFragment();
+          for(var i=0;i<tipSts.length;++i){
+            var tp = document.createElement('li');
+            tp.innerHTML = tipSts[i];
+            tp.onmouseover = function(){
+              input.value = this.innerHTML;
+            }
+            tp.onclick = function(){showTips(input,tipElem,1);return;};
+            temp.appendChild(tp);
+          }
+          tip.appendChild(temp);
+        }
+        else{
+          tip.style.cssText = 'display:none;'
+        }        
+      }
+      document.getElementById('startSt').onkeyup = function(){
+        showTips(this, document.getElementById('startStTip'))
+      };
+      document.getElementById('startSt').oninput = function(){
+        showTips(this, document.getElementById('startStTip'))
+      };      
+      document.getElementById('startSt').onchange = function(){
+        showTips(this, document.getElementById('startStTip'))
+      };
+      document.getElementById('startSt').onblur = function(){
+        showTips(this, document.getElementById('startStTip'),1);
+      }
+      document.getElementById('endSt').onkeyup = function(){
+        showTips(this, document.getElementById('endStTip'))
+      };
+      document.getElementById('endSt').oninput = function(){
+        showTips(this, document.getElementById('endStTip'))
+      };      
+      document.getElementById('endSt').onchange = function(){
+        showTips(this, document.getElementById('endStTip'))
+      };
+      document.getElementById('endSt').onblur = function(){
+        showTips(this, document.getElementById('startStTip'),1);
+      }      
+      document.getElementById('find').onclick = function(){
+        if(document.getElementById('Peak').checked) Peak = true;
+        else Peak = false;
+        showTips(document.getElementById('endSt'), document.getElementById('endStTip'),1);
+        Find(document.getElementById('startSt').value, document.getElementById('endSt').value);
+      }
+    </script>
+  </body>
+</html>
