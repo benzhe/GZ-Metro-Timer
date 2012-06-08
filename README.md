@@ -12,3 +12,7 @@ DEMO: http://gzmetro.sinaapp.com/
     3. index.html ：路线的显示方式自己动手吧
 
 测试过的浏览器：IE7+, FF3+，Android Browser, Android UC Browser
+
+
+
+木有什么版权信息，拿去就用吧...
