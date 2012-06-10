@@ -73,7 +73,7 @@
         document.getElementById('content').innerHTML = '';
         Paths.sortBy('allTime');
         
-        var Tmpl = '<tr> <td colspan=2 class="RouteName">{Route}</td> <td>{StationCount}，全程需要</td> </tr> <tr> <td rowspan=2 class="DetailTip">{PathNum}</td> <td rowspan=3> <table border="1" class="PathListTable"> {PathList} </table> </td> <td><span class="AllTime">{AllTime}</span><br /><span>分钟</span></td> </tr> <tr> <td class="HubTime">其中换乘{LineCount}次，需{HubTime}分钟</td> </tr>';
+        var Tmpl = '<tr> <td colspan=2 class="RouteName">{Route}</td> <td>{StationCount}，全程需要</td> </tr> <tr> <td rowspan=2 class="DetailTip">{PathNum}</td> <td rowspan=2> <table border="1" class="PathListTable"> {PathList} </table> </td> <td><span class="AllTime">{AllTime}</span><br /><span>分钟</span></td> </tr> <tr> <td class="HubTime">其中换乘{LineCount}次，需{HubTime}分钟</td> </tr>';
         for(var num=0;(num<3 && num < Paths.length);++num){
           var tmpl = Tmpl;
           var paths = Paths[num].paths;
@@ -215,7 +215,7 @@
         showTips(this, document.getElementById('endStTip'))
       };
       document.getElementById('endSt').onblur = function(){
-        showTips(this, document.getElementById('startStTip'),1);
+        showTips(this, document.getElementById('endStTip'),1);
       }      
       document.getElementById('find').onclick = function(){
         if(document.getElementById('Peak').checked) Peak = true;
