@@ -15,4 +15,4 @@ DEMO: http://gzmetro.sinaapp.com/
 
 
 
-木有什么版权信息，拿去就用吧...
+木有什么版权信息
