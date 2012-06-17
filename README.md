@@ -1,6 +1,8 @@
 广州地铁估时工具
 ======
 
+练习寻路算法的小成品。
+
 DEMO: http://gzmetro.sinaapp.com/
 
 支持各站时间微调、增加中转耗时、增加高峰时耗时。
@@ -12,7 +14,6 @@ DEMO: http://gzmetro.sinaapp.com/
     3. index.html ：路线的显示方式自己动手吧
 
 测试过的浏览器：IE7+, FF3+，Android Browser, Android UC Browser
-
 
 
 木有什么版权信息
