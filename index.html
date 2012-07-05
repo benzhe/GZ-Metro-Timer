@@ -106,10 +106,10 @@
           route.forEach(function(item){
             if(un(item[3])) {
               //非中转:
-              routeTmpl += '<tr><td>'+item[0]+" &rArr; "+item[1]+'</td></tr>';
+              routeTmpl += '<tr><td><span style="float:left">&dArr;</span>'+item[0]+" &rArr; "+item[1]+'</td></tr>';
             }
             else{
-              routeTmpl += '<tr><td class="Hub">在 '+item[1]+' 换乘 '+item[3]+'，方向：'+item[4]+'</td></tr>';
+              routeTmpl += '<tr><td class="Hub"><span style="float:left">&hArr;</span>在 '+item[1]+' 换乘 '+item[3]+'，方向：'+item[4]+'</td></tr>';
             }
           });
           tmpl = tmpl.replace("{PathList}", routeTmpl);
@@ -131,7 +131,8 @@
 
       }
       function Find(start,end){
-        if(start.trim() == end.trim()) return;             
+        if(start.trim() == end.trim()) return;
+        document.getElementById('endStTip').style.cssText = 'display:none;'
         if(!_Lock) {          
           _Lock = true;
           Paths = [];   
